@@ -481,6 +481,7 @@
   var canPublish = false;
   var artifactApi = null;
   var localOnly = false;
+  var IS_EDITABLE = !!(window.claude && typeof window.claude.use === "function");
 
   function clone(o){ return JSON.parse(JSON.stringify(o)); }
 
@@ -598,16 +599,18 @@
       frag.appendChild(el("p", "empty", "No files linked."));
     }
 
-    var row = el("div", "btn-row");
-    var edit = el("button", "btn", "Edit this week");
-    edit.addEventListener("click", function(){ editingId = w.id; render(); });
-    row.appendChild(edit);
-    if(!isCurrent){
-      var makeCurrent = el("button", "btn", "Make this the current week");
-      makeCurrent.addEventListener("click", function(){ setCurrentWeek(w.id); });
-      row.appendChild(makeCurrent);
+    if(IS_EDITABLE){
+      var row = el("div", "btn-row");
+      var edit = el("button", "btn", "Edit this week");
+      edit.addEventListener("click", function(){ editingId = w.id; render(); });
+      row.appendChild(edit);
+      if(!isCurrent){
+        var makeCurrent = el("button", "btn", "Make this the current week");
+        makeCurrent.addEventListener("click", function(){ setCurrentWeek(w.id); });
+        row.appendChild(makeCurrent);
+      }
+      frag.appendChild(row);
     }
-    frag.appendChild(row);
     return frag;
   }
 
@@ -816,6 +819,7 @@
     var f = document.getElementById("foot");
     var old = f.querySelector(".foot-msg");
     if(old) old.remove();
+    if(!IS_EDITABLE) return;
     var p = el("p", "foot-msg");
     p.style.margin = "0";
     if(canPublish){
